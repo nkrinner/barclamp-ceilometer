@@ -37,6 +37,13 @@ class CeilometerService < PacemakerServiceObject
             "windows" => "/.*/"
           }
         },
+        "ceilometer-agent-hyperv" => {
+          "unique" => false,
+          "count" => -1,
+          "platform" => {
+            "windows" => "/.*/"
+          }
+        },
         "ceilometer-cagent" => {
           "unique" => false,
           "count" => 1,
@@ -90,6 +97,8 @@ class CeilometerService < PacemakerServiceObject
       NodeObject.find("roles:nova-multi-compute-vmware") +
       NodeObject.find("roles:nova-multi-compute-xen")
 
+    hyperv_agent_nodes = NodeObject.find("roles:nova-multi-compute-hyperv")
+
     nodes       = NodeObject.all
     nodes.delete_if { |n| n.nil? or n.admin? }
 
@@ -100,6 +109,7 @@ class CeilometerService < PacemakerServiceObject
 
     base["deployment"]["ceilometer"]["elements"] = {
         "ceilometer-agent" => agent_nodes.map { |x| x.name },
+        "ceilometer-agent-hyperv" => hyperv_agent_nodes.map { |x| x.name },
         "ceilometer-cagent" => [ server_nodes.first.name ],
         "ceilometer-server" => [ server_nodes.first.name ],
         "ceilometer-swift-proxy-middleware" => swift_proxy_nodes.map { |x| x.name }
